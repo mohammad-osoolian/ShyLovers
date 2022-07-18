@@ -9,6 +9,8 @@ import os
 
 TOKEN = os.getenv('TOKEN')
 
+PORT = int(os.environ.get('PORT', 5000))
+
 USERS = {}
 
 START_TEXT =    ("Hello! \nI made this bot for shy lovers, shy people who may miss their best chances"
