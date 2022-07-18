@@ -1,6 +1,7 @@
 from tools import *
 from database import *
 
+
 #status codes:
 # 0: new user,
 # 1: wating for forward message from crush,
@@ -10,14 +11,14 @@ from database import *
 
 
 def informcuple(userid:int):
-    crushid = USERS[userid]['crush']
-    user = getuser(userid)
-    crush = getuser(crushid)
+    crushid = BotUser(userid).csh
+    user = getfulluser(userid)
+    crush = getfulluser(crushid)
     user.send_message(INFORMCUOLE_TEXT(crush))
     crush.send_message(INFORMCUOLE_TEXT(user))
 
 
-def getuser(userid):
+def getfulluser(userid):
     return bot.get_chat_member(chat_id=userid, user_id=userid).user
 
 
@@ -27,63 +28,77 @@ bot = Bot(TOKEN)
 
 def start(update: Update, context: CallbackContext):
     userid = update.effective_user.id
-    inituser(userid)
+    if not BotUser.isuser(userid):
+        BotUser.newuser(userid)
     update.message.reply_text(START_TEXT)
 
 def help(update: Update, context: CallbackContext):
-    inituser(update.effective_user.id)
+    userid = update.effective_user.id
+    if not BotUser.isuser(userid):
+        BotUser.newuser(userid)
     update.message.reply_text(HELP_TEXT)
 
 def setcrush(update: Update, context: CallbackContext):
-    inituser(update.effective_user.id)
-    USERS[update.effective_user.id]['st'] = 1
+    userid = update.effective_user.id
+    if not BotUser.isuser(userid):
+        BotUser.newuser(userid)
+    usr = BotUser(userid)
+    usr.st = 1
     update.message.reply_text(SETCRUSH_TEXT)
 
 
 def chckcrush(update: Update, context:CallbackContext):
-    if USERS[update.effective_user.id]['st'] != 1:
+    usr = BotUser(update.effective_user.id)
+    if usr.st != 1:
         return
-    USERS[update.effective_user.id]['st'] = 2
-    USERS[update.effective_user.id]['crush'] = update.effective_message.forward_from.id
+    usr.st = 2
+    usr.csh = update.effective_message.forward_from.id
     update.message.reply_text(CHCKCRUSH_TEXT)
 
 def confirmcrush(update: Update, cotext: CallbackContext):
-    if USERS[update.effective_user.id]['st'] != 2:
+    usr = BotUser(update.effective_user.id)
+    if usr.st != 2:
         return
     if update.message.text == 'Y':
-        USERS[update.effective_user.id]['st'] = 3
+        usr.st = 3
         update.message.reply_text(CONFIRMCRUSH_YES_TEXT)
     elif update.message.text == 'N':
-        USERS[update.effective_user.id]['st'] = 1
+        usr.st = 1
+        usr.csh = None
         update.message.reply_text(CONFIRMCRUSH_NO_TEXT)
     
 def confirmchoose(update: Update, cotext: CallbackContext):
-    if USERS[update.effective_user.id]['st'] != 3:
+    usr = BotUser(update.effective_user.id)
+    if usr.st != 3:
         return
     if update.message.text.lower() == 'not sure':
-        USERS[update.effective_user.id]['st'] = 0
-        USERS[update.effective_user.id]['crush'] = ''
+        usr.clear()
         update.message.reply_text(CONFIRMCHOOSE_NO_TEXT)
     if update.message.text.lower() == 'sure':
-        USERS[update.effective_user.id]['st'] = 4
+        usr.st = 4
         update.message.reply_text(CONFIRMCHOOSE_YES_TEXT)
     
-    result = checkusercrush(update.effective_user.id)
+    result = usr.ismatched()
     if result == True:
         informcuple(update.effective_user.id)
 
 
 def cancel(update: Update, context: CallbackContext):
-    inituser(update.effective_user.id)
+    userid = update.effective_user.id
+    if not BotUser.isuser(userid):
+        BotUser.newuser(userid)
+    usr = BotUser(userid)
+    usr.clear()
     update.message.reply_text(CANCEL_TEXT)
 
 
 def mycrush(update: Update, context: CallbackContext):
-    crushid = USERS[update.effective_user.id]['crush']
-    if crushid == '':
+    usr = BotUser(update.effective_user.id)
+    crushid = usr.csh
+    if crushid == None:
         update.message.reply_text(MYCRUSH_EMPTY_TEXT)
         return
-    crush = getuser(crushid)
+    crush = getfulluser(crushid)
     prof = crush.get_profile_photos(0,1)
 
     if len(prof.photos) > 0:
@@ -109,6 +124,7 @@ try:
     BotUser.ctrl = ctrl
 
     updater.start_polling()
+    print('Bot is ON')
     updater.idle()
 except Exception as e:
     print(e)

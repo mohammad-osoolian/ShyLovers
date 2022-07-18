@@ -1,4 +1,3 @@
-import json
 from telegram import Bot, User
 from telegram.ext.updater import Updater
 from telegram.update import Update
@@ -12,15 +11,15 @@ USERS = {}
 
 START_TEXT =    ("Hello! \nI made this bot for shy lovers, shy people who may miss their best chances"
                 " to have a great relaionship. this is a bot to save those perfect honest relationships"
-                "that never start.\nif you love someone and you think she/he truely loves you too and"
-                "you are waiting just for a spark to try chance of having eachother, I'm proud to help you!😃"
+                " that never start.\nif you love someone and you think she/he truely loves you too and"
+                " you are waiting just for a spark to try chance of having eachother, I'm proud to help you!😃"
                 "\nWrite /help to explain it for you")
 
 
 HELP_TEXT = ("You can tell this bot who is your crush and if your crush has crush on you too,"
             " I will tell you both at the same time that you are ready to start a great relationship and this is the spark!✨"
             "\nand if your crush doesn't have crush on you, trust me I will never tell her/him anything :)"
-            "\nhere is the list of command that can help you to use this bot:"
+            "\n\n\nhere is the list of command that can help you to use this bot:"
             "\n/help : shows this text "
             "\n/setcrush : tell the bot who is your crush "
             # "\n/foundcuples : number of couples found till this moment using this bot :) "
