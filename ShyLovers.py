@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from tools import *
 from database import *
 
@@ -20,10 +23,6 @@ def informcuple(userid:int):
 
 def getfulluser(userid):
     return bot.get_chat_member(chat_id=userid, user_id=userid).user
-
-
-updater = Updater(TOKEN, use_context=True)
-bot = Bot(TOKEN)
 
 
 def start(update: Update, context: CallbackContext):
@@ -106,6 +105,9 @@ def mycrush(update: Update, context: CallbackContext):
     else:
         update.message.reply_text(MYCRUSH_TEXT(crush))
 
+
+updater = Updater(TOKEN, use_context=True)
+bot = Bot(TOKEN)
 
 
 updater.dispatcher.add_handler(CommandHandler('start', start))

@@ -5,8 +5,10 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.commandhandler import CommandHandler
 from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
+import os
 
-TOKEN = "5581917717:AAH93gD7cbqlGbXMbuOHEPnBpartWD4aOtA"
+TOKEN = os.getenv('TOKEN')
+
 USERS = {}
 
 START_TEXT =    ("Hello! \nI made this bot for shy lovers, shy people who may miss their best chances"
