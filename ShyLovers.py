@@ -143,7 +143,7 @@ def mycrush(update: Update, context: CallbackContext):
 
 def setlang(update: Update, context: CallbackContext):
     usr = BotUser(update.effective_user.id)
-    update.message.reply_text(SETLANG_TEXT(usr.lng), reply_markup=SETLANG_KEYBOARD(usr.lng))
+    update.message.reply_text(SETLANG_TEXT(usr.lng), reply_markup=SETLANG_KEYBOARD())
 
 updater = Updater(TOKEN, use_context=True)
 bot = Bot(TOKEN)
