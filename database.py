@@ -46,9 +46,9 @@ class BotUserDBController:
             result = cur.fetchall()
         return result
 
-    def update(self, id, st, csh):
+    def update(self, id, st, csh, lng):
         with self.conn, self.conn.cursor() as cur:
-            cur.execute('UPDATE BOTUSER SET st = %s, csh = %s WHERE id = %s', (st, csh, id,))
+            cur.execute('UPDATE BOTUSER SET st = %s, csh = %s, lng = %s WHERE id = %s', (st, csh, lng, id))
         return
     
     def delete(self, id):
@@ -56,15 +56,16 @@ class BotUserDBController:
             cur.execute('DELETE FROM BOTUSER WHERE id = %s', (id,))
         return
     
-    def create(self, id, st, csh):
+    def create(self, id, st, csh, lng):
         with self.conn, self.conn.cursor() as cur:
-            cur.execute('INSERT INTO BOTUSER VALUES (%s, %s, %s)', (id, st, csh))
+            cur.execute('INSERT INTO BOTUSER VALUES (%s, %s, %s, %s)', (id, st, csh, lng))
         return
 
 
 class BotUser:
     ctrl = None
     STATUSES = (0,1,2,3,4)
+    LANGUAGES = ('en','far')
 
     def __init__(self, id:int):
         if not BotUser.isuser(id):
@@ -73,7 +74,11 @@ class BotUser:
         self._id = id
         self._st = usr[1]
         self._csh = usr[2]
+        self._lng = usr[3]
     
+    def updatedb(self):
+        self.ctrl.update(self.id, self.st, self.csh, self.lng)
+
     @property
     def id(self):
         return self._id
@@ -89,9 +94,8 @@ class BotUser:
         if v not in self.STATUSES:
             raise Exception('status is not valid.')
         self._st = v
-        self.ctrl.update(self.id, self.st, self.csh)
+        self.updatedb()
         
-    
     @property
     def csh(self):
         return self._csh
@@ -100,7 +104,17 @@ class BotUser:
         if v == self.id:
             raise Exception('csh canot be equal to id.')
         self._csh = v
-        self.ctrl.update(self.id, self.st, self.csh)
+        self.updatedb()
+    
+    @property
+    def lng(self):
+        return self._lng
+    @lng.setter
+    def lng(self, v):
+        if v not in self.LANGUAGES:
+            raise Exception('language is not valid.')
+        self._lng = v
+        self.updatedb()
 
     @classmethod
     def isuser(cls, id):
@@ -108,10 +122,10 @@ class BotUser:
         return id in [user[0] for user in users]
     
     @classmethod
-    def newuser(cls, id, st=0, csh=None):
+    def newuser(cls, id, st=0, csh=None, lng='en'):
         if cls.isuser(id):
             raise Exception('duplicate id')
-        cls.ctrl.create(id, st, csh)
+        cls.ctrl.create(id, st, csh, lng)
         usr = BotUser(id)
         return usr
     
